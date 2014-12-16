@@ -75,5 +75,15 @@ def show_last_game():
 	return jsonify(result), 200
 
 
+@app.route('/highscore')
+def show_highscore():
+	user = g.db.execute('select user_id, name, email, played, highscore from '
+			'user where highscore not null').fetchall()
+	result = {}
+	for u in user:
+		result[u[4]] = {'user_id' : u[0], 'name' : u[1], 'email' : u[2],
+				'played' : u[3]}
+	return jsonify(result), 200
+
 if __name__ == '__main__':
 	app.run(host='0.0.0.0', debug=True, threaded=True)
