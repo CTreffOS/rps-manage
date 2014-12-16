@@ -53,25 +53,25 @@ def show_user_by_id(id):
 	return jsonify(result), 200
 
 
-@app.route('/games')
+@app.route('/game')
 def show_games():
-	games = g.db.execute('select game_id, p1, p2, result1, result2 from '
-			'games').fetchall()
+	games = g.db.execute('select game_id, user_id_1, user_id_2, win_player_1, win_player_2 '
+			'from game').fetchall()
 	result = []
 	for ga in games:
-		result.append({'game_id' : ga[0], 'p1' : ga[1], 'p2' : ga[2], 'result1' :
-			ga[3], 'result2' : ga[4]})
+		result.append({'game_id' : ga[0], 'user_id_1' : ga[1], 'user_id_2' : ga[2], 
+			'won_1' : ga[3], 'won_2' : ga[4]})
 	return jsonify({'games' : result}), 200
 
 
 @app.route('/lastgame')
 def show_last_game():
-	game = g.db.execute('select max(game_id), p1, p2, result1, result2 from '
-			'games').fetchone()
-	if not game:
+	ga = g.db.execute('select game_id, user_id_1, user_id_2, win_player_1, win_player_2 '
+			'from game order by game_id desc limit 0,1').fetchone()
+	if not ga:
 		return 'Last game not found', 404
-	result = {'game_id' : game[0], 'p1' : game[1], 'p2' : game[2], 'result1' :
-			game[3], 'result2' : game[4]}
+	result = {'game_id' : ga[0], 'user_id_1' : ga[1], 'user_id_2' : ga[2], 
+		'won_1' : ga[3], 'won_2' : ga[4]}
 	return jsonify(result), 200
 
 
