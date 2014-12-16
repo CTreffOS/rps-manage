@@ -15,16 +15,16 @@ def init():
 			user_id INTEGER PRIMARY KEY AUTOINCREMENT,
 			name STRING NOT NULL,
 			email STRING,
-			code STRING NOT NULL,
+			code STRING NOT NULL UNIQUE,
 			played BOOL NOT NULL DEFAULT FALSE,
 			docker_image STRING NOT NULL,
 			highscore INTEGER DEFAULT NULL)''')
 		cur.execute('''CREATE TABLE IF NOT EXISTS games (
 			game_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-			p1 INT,
-			p2 INT,
+			p1 INTEGER,
+			p2 INTEGER,
 			result1 STRING,
-			result2 STRING )''')
+			result2 STRING)''')
 		con.commit()
 
 
