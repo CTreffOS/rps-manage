@@ -13,11 +13,24 @@ import time
 from urllib2 import urlopen
 import subprocess
 
+testplayer = ('rockpaperscissors/player', 'rockpaperscissors/player',
+'rockpaperscissors/player2')
+
+
 def get_next():
 	with sqlite3.connect('data.db') as con:
 		cur = con.cursor()
-		cur.execute('select * from user where not played limit 0,1')
+		cur.execute('''select user_id, name, docker_image
+		from user where not played limit 0,1''')
 		return cur.fetchone()
+
+
+def get_highscore_player():
+	with sqlite3.connect('data.db') as con:
+		cur = con.cursor()
+		cur.execute('''select user_id, docker_image
+		from user where highscore order by highscore desc''')
+		return cur.fetchall()
 
 
 def play(p1, p2):
@@ -105,10 +118,51 @@ def save_game(p1, p2, r1, r2):
 		con.commit()
 
 
+def mark_played(pid):
+	with sqlite3.connect('data.db') as con:
+		cur = con.cursor()
+		cur.execute('update user set played=1 where user_id = ?', (pid,))
+		con.commit()
+
+
+def player_highscore(pid, n):
+	with sqlite3.connect('data.db') as con:
+		cur = con.cursor()
+		cur.execute('update user set highscore=? where user_id = ?', (n,pid))
+		con.commit()
+
+
 
 if __name__ == "__main__":
-	nextplayer = get_next()
-	result = play('rockpaperscissors/player', 'rockpaperscissors/player2')
-	if result:
-		save_game(1, 2, result[0], result[1])
+	pid, pname, pdocker = get_next()
 
+	# Mark this player
+	mark_played(pid)
+
+	# Play against testplayer
+	for tdocker in testplayer:
+		result = play(pdocker, tdocker)
+		if not result:
+			exit()
+		save_game(pid, 0, result[0], result[1])
+		# Player lost -> The end
+		if result[0]['won'] < result[1]['won']:
+			exit()
+
+	# Play against highscore
+	highscore = get_highscore_player()
+	n = len(highscore)
+	if n <= 10:
+			player_highscore(pid, n+1)
+
+	for oid, odocker in highscore:
+		result = play(pdocker, odocker)
+		if not result:
+			exit()
+		save_game(pid, oid, result[0], result[1])
+		# Player lost -> The end
+		if result[0]['won'] < result[1]['won']:
+			exit()
+		else:
+			player_highscore(pid, n)
+			player_highscore(oid, n+1 if n < 10 else None)
