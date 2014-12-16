@@ -93,6 +93,22 @@ def play(p1, p2):
 	return result[id1], result[id2]
 
 
+def save_game(p1, p2, r1, r2):
+	with sqlite3.connect('data.db') as con:
+		cur = con.cursor()
+		cur.execute('''insert into game ( user_id_1, user_id_2, win_player_1,
+			win_player_2, rock_player_1, paper_player_1, scissors_player_1,
+			rock_player_2, paper_player_2, scissors_player_2 )
+			values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+			( p1, p2, r1['won'], r2['won'], r1['rock'], r1['paper'],
+				r1['scissors'], r2['rock'], r2['paper'], r2['scissors'] ))
+		con.commit()
+
+
+
 if __name__ == "__main__":
 	nextplayer = get_next()
-	print play('rockpaperscissors/player', 'rockpaperscissors/player')
+	result = play('rockpaperscissors/player', 'rockpaperscissors/player')
+	if result:
+		save_game(1, 2, result[0], result[1])
+

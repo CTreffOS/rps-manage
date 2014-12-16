@@ -19,12 +19,18 @@ def init():
 			played BOOL NOT NULL DEFAULT FALSE,
 			docker_image STRING NOT NULL,
 			highscore INTEGER DEFAULT NULL)''')
-		cur.execute('''CREATE TABLE IF NOT EXISTS games (
+		cur.execute('''CREATE TABLE IF NOT EXISTS game (
 			game_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-			p1 INTEGER,
-			p2 INTEGER,
-			result1 STRING,
-			result2 STRING)''')
+         user_id_1         INTEGER,
+         user_id_2         INTEGER,
+         win_player_1      INTEGER,
+         win_player_2      INTEGER,
+         rock_player_1     INTEGER,
+         paper_player_1    INTEGER,
+         scissors_player_1 INTEGER,
+         rock_player_2     INTEGER,
+         paper_player_2    INTEGER,
+         scissors_player_2 INTEGER)''')
 		con.commit()
 
 
