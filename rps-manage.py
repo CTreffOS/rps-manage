@@ -40,6 +40,7 @@ def play(p1, p2):
 		try:
 			result = urlopen('http://localhost:4441').read()
 		except:
+			time.sleep(0.1)
 			n += 1
 			if n > 10000:
 				print('Failed to connect to rps-server')
@@ -82,9 +83,7 @@ def play(p1, p2):
 				error = True
 
 	# Drop docker container
-	subprocess.Popen( ['docker', 'stop', 'rps-server', 'rps-player-one',
-		'rps-player-two']).communicate()
-	subprocess.Popen( ['docker', 'rm', 'rps-server', 'rps-player-one',
+	subprocess.Popen( ['docker', 'rm', '-f', 'rps-server', 'rps-player-one',
 		'rps-player-two']).communicate()
 
 	if error:
@@ -100,15 +99,16 @@ def save_game(p1, p2, r1, r2):
 			win_player_2, rock_player_1, paper_player_1, scissors_player_1,
 			rock_player_2, paper_player_2, scissors_player_2 )
 			values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-			( p1, p2, r1['won'], r2['won'], r1['rock'], r1['paper'],
-				r1['scissors'], r2['rock'], r2['paper'], r2['scissors'] ))
+			( p1, p2, r1['won'], r2['won'],
+				r1['rock'], r1['paper'], r1['scissors'],
+				r2['rock'], r2['paper'], r2['scissors'] ))
 		con.commit()
 
 
 
 if __name__ == "__main__":
 	nextplayer = get_next()
-	result = play('rockpaperscissors/player', 'rockpaperscissors/player')
+	result = play('rockpaperscissors/player', 'rockpaperscissors/player2')
 	if result:
 		save_game(1, 2, result[0], result[1])
 
