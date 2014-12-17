@@ -4,6 +4,10 @@ rps-data-server
 This is a small server application deliver the information stored in the sqlite
 database data.db in json format via http.
 
+
+REST
+----
+
 There are two REST points:
 
 - /lastgame returns dictionary in json format with the following entries with
@@ -96,6 +100,18 @@ There are two REST points:
 			"won": 1
 		}
 	}
+
+
+Usage
+-----
+
+It is possible to use this application as a standalone with the command:
+	python rps-data-server.py
+but it is recommended to use another HTTP Server like gunicorn. For example to
+start this Application with 32 worker on port 5000 with gunicorn use the
+command:
+	gunicorn -w 32 -b 0.0.0.0:5000 rps-data-server:app
+
 
 Requirements
 ------------
