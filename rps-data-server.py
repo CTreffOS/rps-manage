@@ -28,25 +28,29 @@ def show_last_game():
 			'limit 0,1').fetchone()
 	if not ga:
 		return 'Last game not found', 404
-	player1 = g.db.execute('select name from user where user_id = ?', (ga[0],)).fetchone()
-	player2 = g.db.execute('select name from user where user_id = ?', (ga[1],)).fetchone()
+	player1 = g.db.execute('select name, code from user where user_id = ?',
+			(ga[0],)).fetchone()
+	player2 = g.db.execute('select name, code from user where user_id = ?',
+			(ga[1],)).fetchone()
 	if not (player1 or player2):
 		return 'Player not found', 500
-	result = {'user_1' : player1[0], 'user_2' : player2[0], 'won_1' : ga[2],
-			'won_2' : ga[3], 'rock_1' : ga[4], 'paper_1' : ga[5],'scissors_1' :
-			ga[6], 'rock_2' : ga[7], 'paper_2' : ga[8],'scissors_2' : ga[9]}
+	result = {'name_1' : player1[0], 'name_2' : player2[0], 'code_1' :
+		player1[1], 'code_2' : player2[1], 'won_1' : ga[2], 'won_2' : ga[3],
+			'rock_1' : ga[4], 'paper_1' : ga[5],'scissors_1' : ga[6], 'rock_2' :
+			ga[7], 'paper_2' : ga[8],'scissors_2' : ga[9]}
 	return jsonify(result), 200
 
 
 @app.route('/highscore')
 def show_highscore():
-	user = g.db.execute('select user_id, name, highscore from user where highscore not null').fetchall()
+	user = g.db.execute('select user_id, name, highscore, code from user where '
+			'highscore not null').fetchall()
 	result = {}
 	for u in user:
 		won = g.db.execute('select count() from game where (user_id_1 = ? and '
 				'win_player_1 > win_player_2) or (user_id_2 = ? and win_player_2 > '
 				'win_player_1)', (u[0],u[0])).fetchone()[0]
-		result[u[2]] =	{'user_id' : u[0], 'name' : u[1], 'won' : won}
+		result[u[2]] =	{'code' : u[3], 'name' : u[1], 'won' : won}
 	return jsonify(result), 200
 
 
