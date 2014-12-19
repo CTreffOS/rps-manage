@@ -134,7 +134,7 @@ def player_highscore(pid, n):
 
 
 if __name__ == "__main__":
-	pid, pname, pdocker = get_next()
+	pid, pname, pdocker = get_next() or exit('No upcoming player.\nExiting...')
 
 	# Mark this player
 	mark_played(pid)
