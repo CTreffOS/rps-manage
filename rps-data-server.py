@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, g
+import json
 import sqlite3
 
 # Create aplication
@@ -38,7 +39,8 @@ def show_last_game():
 		player1[1], 'code_2' : player2[1], 'won_1' : ga[2], 'won_2' : ga[3],
 			'rock_1' : ga[4], 'paper_1' : ga[5],'scissors_1' : ga[6], 'rock_2' :
 			ga[7], 'paper_2' : ga[8],'scissors_2' : ga[9]}
-	return jsonify(result), 200
+	return 'lastgame=' + json.dumps(result), 200
+	#return jsonify(result), 200
 
 
 @app.route('/highscore')
@@ -51,7 +53,8 @@ def show_highscore():
 				'win_player_1 > win_player_2) or (user_id_2 = ? and win_player_2 > '
 				'win_player_1)', (u[0],u[0])).fetchone()[0]
 		result[u[2]] =	{'code' : u[3], 'name' : u[1], 'won' : won}
-	return jsonify(result), 200
+	return 'highscore=' + json.dumps(result), 200
+	#return jsonify(result), 200
 
 
 if __name__ == '__main__':
