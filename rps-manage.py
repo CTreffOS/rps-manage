@@ -39,6 +39,8 @@ def play(p1, p2):
 
 	error = False
 
+	print('### Starting Docker Container')
+
 	id1 = str(random.randint(1000000000,9999999999))
 	id2 = str(random.randint(1000000000,9999999999))
 	p = subprocess.Popen( ['docker', 'run', '-d', '--name', 'rps-server',
@@ -80,7 +82,8 @@ def play(p1, p2):
 			print('Failed to start player-two docker container')
 			error = True
 
-	# Wait for server to start up
+	print('### Wait for Server to Finish')
+	# Wait for server to finish
 	result = 'playing'
 	if not error:
 		while result == 'playing':
@@ -98,12 +101,15 @@ def play(p1, p2):
 			except:
 				error = True
 
+	print('### Store Logs')
 	# Keep logs
 	logname = ''.join([ c for c in str(datetime.now())[0:-7] if c in '0123456789' ])
+	os.system('mkdir -p logs')
 	os.system('docker logs rps-server     &> logs/%s.serv.log' % logname)
 	os.system('docker logs rps-player-one &> logs/%s.p1.log' % logname)
 	os.system('docker logs rps-player-two &> logs/%s.p2.log' % logname)
 
+	print('### Drop Containers')
 	# Drop docker container
 	subprocess.Popen( ['docker', 'rm', '-f', 'rps-server', 'rps-player-one',
 		'rps-player-two']).communicate()
