@@ -12,6 +12,8 @@ import random
 import time
 from urllib2 import urlopen
 import subprocess
+from datetime import datetime
+import os
 
 testplayer = ('rockpaperscissors/player', 'rockpaperscissors/player',
 'rockpaperscissors/player2')
@@ -44,6 +46,7 @@ def play(p1, p2):
 	p.communicate()
 	if p.returncode:
 		print('Failed to start rps-server docker container')
+		# Something is wrong on our side. Exit immediately.
 		exit()
 
 	# Wait for server to start up
@@ -95,6 +98,12 @@ def play(p1, p2):
 			except:
 				error = True
 
+	# Keep logs
+	logname = ''.join([ c for c in str(datetime.now())[0:-7] if c in '0123456789' ])
+	os.system('docker logs rps-server     &> logs/%s.serv.log' % logname)
+	os.system('docker logs rps-player-one &> logs/%s.p1.log' % logname)
+	os.system('docker logs rps-player-two &> logs/%s.p2.log' % logname)
+
 	# Drop docker container
 	subprocess.Popen( ['docker', 'rm', '-f', 'rps-server', 'rps-player-one',
 		'rps-player-two']).communicate()
@@ -136,12 +145,12 @@ def player_highscore(pid, n):
 if __name__ == "__main__":
 	pid, pname, pdocker = get_next() or exit('No upcoming player.\nExiting...')
 
-	# Mark this player
-	mark_played(pid)
-
 	# Play against testplayer
 	for tdocker in testplayer:
 		result = play(pdocker, tdocker)
+
+		# Mark this player in any case
+		mark_played(pid)
 		if not result:
 			exit()
 		save_game(pid, 0, result[0], result[1])
