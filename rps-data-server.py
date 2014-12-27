@@ -46,13 +46,13 @@ def show_last_game():
 @app.route('/highscore')
 def show_highscore():
 	user = g.db.execute('select user_id, name, highscore, code from user where '
-			'highscore not null').fetchall()
-	result = {}
+			'highscore not null order by highscore asc').fetchall()
+	result = []
 	for u in user:
 		won = g.db.execute('select count() from game where (user_id_1 = ? and '
 				'win_player_1 > win_player_2) or (user_id_2 = ? and win_player_2 > '
 				'win_player_1)', (u[0],u[0])).fetchone()[0]
-		result[u[2]] =	{'code' : u[3], 'name' : u[1], 'won' : won}
+		result.append({'score': u[2], 'code' : u[3], 'name' : u[1], 'won' : won})
 	return 'highscore=' + json.dumps(result), 200
 	#return jsonify(result), 200
 
