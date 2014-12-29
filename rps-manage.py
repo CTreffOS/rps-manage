@@ -14,9 +14,10 @@ from urllib2 import urlopen
 import subprocess
 from datetime import datetime
 import os
+import shutil
 
-testplayer = ('rockpaperscissors/player', 'rockpaperscissors/player',
-'rockpaperscissors/player2')
+testplayer = ('rockpaperscissors/testclient4', 'rockpaperscissors/testclient5',
+		'rockpaperscissors/testclient6')
 
 
 def get_next():
@@ -151,6 +152,12 @@ def player_highscore(pid, n):
 if __name__ == "__main__":
 	pid, pname, pdocker = get_next() or exit('No upcoming player.\nExiting...')
 
+	print('### Backing up database')
+	backupname = ''.join([ c for c in str(datetime.now())[0:-7] if c in '0123456789' ])
+	shutil.copy2('data.db', 'backup/data.db.' + backupname)
+
+	print('### Now playing: ' + pname)
+
 	# Play against testplayer
 	for tdocker in testplayer:
 		result = play(pdocker, tdocker)
@@ -162,7 +169,9 @@ if __name__ == "__main__":
 		save_game(pid, 0, result[0], result[1])
 		# Player lost -> The end
 		if result[0]['won'] < result[1]['won']:
+			print('### Player has lost against test')
 			exit()
+		print('### Player has won against test')
 
 	# Play against highscore
 	highscore = get_highscore_player()
@@ -176,8 +185,9 @@ if __name__ == "__main__":
 			exit()
 		save_game(pid, oid, result[0], result[1])
 		# Player lost -> The end
-		if result[0]['won'] < result[1]['won']:
+		if result[0]['won'] <= result[1]['won']:
 			exit()
 		else:
 			player_highscore(pid, n)
 			player_highscore(oid, n+1 if n < 10 else None)
+			n -= 1
