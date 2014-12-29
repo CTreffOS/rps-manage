@@ -168,7 +168,7 @@ if __name__ == "__main__":
 			exit()
 		save_game(pid, 0, result[0], result[1])
 		# Player lost -> The end
-		if result[0]['won'] < result[1]['won']:
+		if int(result[0]['won']) < int(result[1]['won']):
 			print('### Player has lost against test')
 			exit()
 		print('### Player has won against test')
@@ -185,7 +185,7 @@ if __name__ == "__main__":
 			exit()
 		save_game(pid, oid, result[0], result[1])
 		# Player lost -> The end
-		if result[0]['won'] <= result[1]['won']:
+		if int(result[0]['won']) <= int(result[1]['won']):
 			exit()
 		else:
 			player_highscore(pid, n)
